@@ -31,7 +31,7 @@ class FullModel(nn.Module):
     self.loss = loss
 
   def forward(self, inputs, labels):
-    outputs = self.model(inputs)
+    outputs = self.model(inputs, labels)
     loss = self.loss(outputs, labels)
     return torch.unsqueeze(loss,0), outputs
 
