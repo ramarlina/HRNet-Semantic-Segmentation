@@ -14,9 +14,10 @@ from torch.nn import functional as F
 
 from .base_dataset import BaseDataset
  
-class Dataset(BaseDataset):
+class ImageFolder(BaseDataset):
     def __init__(self,  
                  list_path, 
+                 get_mask_fn,
                  num_samples=None, 
                  num_classes=20,
                  multi_scale=True, 
@@ -32,6 +33,7 @@ class Dataset(BaseDataset):
         super(Dataset, self).__init__(ignore_label, base_size,
                 crop_size, downsample_rate, scale_factor, mean, std)
  
+        self.get_mask_fn = get_mask_fn
         self.num_classes = num_classes
         self.list_path = list_path
         self.class_weights = None
@@ -46,23 +48,15 @@ class Dataset(BaseDataset):
     
     def read_files(self):
         files = []
-        for item in self.img_list:
-            if 'train' in self.list_path:
-                image_path, label_path = item
-                name = os.path.splitext(os.path.basename(label_path))[0]
-                sample = {"img": image_path,
-                          "label": label_path, 
-                          "name": name}
-                
-            elif 'val' in self.list_path:
-                image_path, label_path = item
-                name = os.path.splitext(os.path.basename(label_path))[0]
-                sample = {"img": image_path,
-                          "label": label_path,
-                          "name": name,}
-            else:
-                raise NotImplementedError('Unknown subset.')
-            files.append(sample)
+        for image_path in self.img_list:  
+            name = os.path.splitext(os.path.basename(image_path))[0]
+            label_path = self.get_mask_fn(name)
+            sample = {
+                "img": image_path,
+                "label": label_path, 
+                 "name": name
+            }  
+            files.append(sample) 
         return files
 
     def resize_image(self, image, label, size): 
