@@ -13,11 +13,15 @@ import torch
 from torch.nn import functional as F
 
 from .base_dataset import BaseDataset
- 
+
+def get_mask_fn(fname):
+    return os.path.basename(fname).replace(".jpg", ".png")
+    
 class ImageFolder(BaseDataset):
     def __init__(self,  
-                 list_path, 
-                 get_mask_fn,
+                 images_path, 
+                 masks_path, 
+                 get_mask_fn=get_mask_fn,
                  num_samples=None, 
                  num_classes=20,
                  multi_scale=True, 
@@ -33,14 +37,15 @@ class ImageFolder(BaseDataset):
         super(Dataset, self).__init__(ignore_label, base_size,
                 crop_size, downsample_rate, scale_factor, mean, std)
  
+        self.masks_path = masks_path
         self.get_mask_fn = get_mask_fn
         self.num_classes = num_classes
-        self.list_path = list_path
+        self.images_path = images_path
         self.class_weights = None
 
         self.multi_scale = multi_scale
         self.flip = flip
-        self.img_list = [line.strip().split() for line in open(list_path)]
+        self.img_list = os.listdir(images_path)
 
         self.files = self.read_files()
         if num_samples:
@@ -50,7 +55,7 @@ class ImageFolder(BaseDataset):
         files = []
         for image_path in self.img_list:  
             name = os.path.splitext(os.path.basename(image_path))[0]
-            label_path = self.get_mask_fn(name)
+            label_path = os.path.join(self.masks_path, self.get_mask_fn(image_path))
             sample = {
                 "img": image_path,
                 "label": label_path, 
@@ -74,7 +79,7 @@ class ImageFolder(BaseDataset):
                     cv2.IMREAD_GRAYSCALE)
         size = label.shape
 
-        if 'testval' in self.list_path:
+        if 'testval' in self.images_path:
             image = cv2.resize(image, self.crop_size, 
                                interpolation = cv2.INTER_LINEAR)
             image = self.input_transform(image)
