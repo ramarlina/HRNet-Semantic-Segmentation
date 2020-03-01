@@ -32,7 +32,8 @@ class ImageFolder(BaseDataset):
                  downsample_rate=1,
                  scale_factor=11,
                  mean=[0.485, 0.456, 0.406], 
-                 std=[0.229, 0.224, 0.225]):
+                 std=[0.229, 0.224, 0.225],
+                 is_test=False):
 
         super(ImageFolder, self).__init__(ignore_label, base_size,
                 crop_size, downsample_rate, scale_factor, mean, std)
@@ -45,9 +46,10 @@ class ImageFolder(BaseDataset):
 
         self.multi_scale = multi_scale
         self.flip = flip
-        self.img_list = os.listdir(images_path)
+        self.img_list = [os.path.join(images_path, f) for f in os.listdir(images_path)]
 
         self.files = self.read_files()
+        self.is_test = is_test
         if num_samples:
             self.files = self.files[:num_samples]
     
@@ -79,7 +81,7 @@ class ImageFolder(BaseDataset):
                     cv2.IMREAD_GRAYSCALE)
         size = label.shape
 
-        if 'testval' in self.images_path:
+        if self.is_test:
             image = cv2.resize(image, self.crop_size, 
                                interpolation = cv2.INTER_LINEAR)
             image = self.input_transform(image)
