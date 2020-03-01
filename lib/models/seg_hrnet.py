@@ -19,7 +19,7 @@ import torch.nn as nn
 import torch._utils
 import torch.nn.functional as F
 
-from .sync_bn.inplace_abn_f.bn import InPlaceABNSync
+from inplace_abn import InPlaceABNSync
 
 BatchNorm2d = functools.partial(InPlaceABNSync, activation='none')
 BN_MOMENTUM = 0.01
