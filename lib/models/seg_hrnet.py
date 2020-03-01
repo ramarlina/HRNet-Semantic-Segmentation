@@ -259,7 +259,7 @@ blocks_dict = {
 
 class HighResolutionNet(nn.Module):
 
-    def __init__(self, config, extra, **kwargs): 
+    def __init__(self, config, **kwargs): 
         super(HighResolutionNet, self).__init__()
 
         # stem net
@@ -271,14 +271,14 @@ class HighResolutionNet(nn.Module):
         self.bn2 = BatchNorm2d(64, momentum=BN_MOMENTUM)
         self.relu = nn.ReLU(inplace=False)
 
-        self.stage1_cfg = extra['STAGE1']
+        self.stage1_cfg = config.extra.STAGE1
         num_channels = self.stage1_cfg['NUM_CHANNELS'][0]
         block = blocks_dict[self.stage1_cfg['BLOCK']]
         num_blocks = self.stage1_cfg['NUM_BLOCKS'][0]
         self.layer1 = self._make_layer(block, 64, num_channels, num_blocks)
         stage1_out_channel = block.expansion*num_channels
 
-        self.stage2_cfg = extra['STAGE2']
+        self.stage2_cfg = config.extra.STAGE2
         num_channels = self.stage2_cfg['NUM_CHANNELS']
         block = blocks_dict[self.stage2_cfg['BLOCK']]
         num_channels = [
@@ -288,7 +288,7 @@ class HighResolutionNet(nn.Module):
         self.stage2, pre_stage_channels = self._make_stage(
             self.stage2_cfg, num_channels)
 
-        self.stage3_cfg = extra['STAGE3']
+        self.stage3_cfg = config.extra.STAGE3
         num_channels = self.stage3_cfg['NUM_CHANNELS']
         block = blocks_dict[self.stage3_cfg['BLOCK']]
         num_channels = [
@@ -298,7 +298,7 @@ class HighResolutionNet(nn.Module):
         self.stage3, pre_stage_channels = self._make_stage(
             self.stage3_cfg, num_channels)
 
-        self.stage4_cfg = extra['STAGE4']
+        self.stage4_cfg = config.extra.STAGE4
         num_channels = self.stage4_cfg['NUM_CHANNELS']
         block = blocks_dict[self.stage4_cfg['BLOCK']]
         num_channels = [
@@ -322,9 +322,9 @@ class HighResolutionNet(nn.Module):
             nn.Conv2d(
                 in_channels=last_inp_channels,
                 out_channels=config.DATASET.NUM_CLASSES,
-                kernel_size=extra.FINAL_CONV_KERNEL,
+                kernel_size=config.extra.FINAL_CONV_KERNEL,
                 stride=1,
-                padding=1 if extra.FINAL_CONV_KERNEL == 3 else 0)
+                padding=1 if config.extra.FINAL_CONV_KERNEL == 3 else 0)
         )
 
     def _make_transition_layer(
