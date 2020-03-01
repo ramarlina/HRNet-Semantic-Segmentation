@@ -279,7 +279,7 @@ class HighResolutionNet(nn.Module):
         stage1_out_channel = block.expansion*num_channels
 
         self.stage2_cfg = config.MODEL.EXTRA.STAGE2
-        num_channels = self.stage2_cf.NUM_CHANNELS
+        num_channels = self.stage2_cfg.NUM_CHANNELS
         block = blocks_dict[self.stage2_cf.BLOCK]
         num_channels = [
             num_channels[i] * block.expansion for i in range(len(num_channels))]
