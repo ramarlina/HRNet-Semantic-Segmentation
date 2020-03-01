@@ -16,9 +16,9 @@ import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-from ..utils.utils import AverageMeter
-from ..utils.utils import get_confusion_matrix
-from ..utils.utils import adjust_learning_rate
+from .utils.utils import AverageMeter
+from .utils.utils import get_confusion_matrix
+from .utils.utils import adjust_learning_rate
 
 def train(config, epoch, num_epoch, epoch_iters, base_lr, 
         num_iters, trainloader, optimizer, model, writer_dict):
@@ -32,6 +32,7 @@ def train(config, epoch, num_epoch, epoch_iters, base_lr,
     global_steps = writer_dict['train_global_steps']
     for i_iter, batch in enumerate(trainloader, 0):
         images, labels, _, _ = batch
+        images = images.cuda()
         labels = labels.long().cuda()
 
         losses, _ = model(images, labels)
