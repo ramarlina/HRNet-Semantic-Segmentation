@@ -261,7 +261,7 @@ class HighResolutionNet(nn.Module):
 
     def __init__(self, config, **kwargs): 
         super(HighResolutionNet, self).__init__()
-
+        extra = config["EXTRA"]
         # stem net
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=2, padding=1,
                                bias=False)
@@ -271,16 +271,16 @@ class HighResolutionNet(nn.Module):
         self.bn2 = BatchNorm2d(64, momentum=BN_MOMENTUM)
         self.relu = nn.ReLU(inplace=False)
 
-        self.stage1_cfg = config.MODEL.EXTRA.STAGE1
-        num_channels = self.stage1_cfg.NUM_CHANNELS[0]
-        block = blocks_dict[self.stage1_cfg.BLOCK]
-        num_blocks = self.stage1_cfg.NUM_BLOCKS[0]
+        self.stage1_cfg = extra['STAGE1']
+        num_channels = self.stage1_cfg['NUM_CHANNELS'][0]
+        block = blocks_dict[self.stage1_cfg['BLOCK']]
+        num_blocks = self.stage1_cfg['NUM_BLOCKS'][0]
         self.layer1 = self._make_layer(block, 64, num_channels, num_blocks)
         stage1_out_channel = block.expansion*num_channels
 
-        self.stage2_cfg = config.MODEL.EXTRA.STAGE2
-        num_channels = self.stage2_cfg.NUM_CHANNELS
-        block = blocks_dict[self.stage2_cfg.BLOCK]
+        self.stage2_cfg = extra['STAGE2']
+        num_channels = self.stage2_cfg['NUM_CHANNELS']
+        block = blocks_dict[self.stage2_cfg['BLOCK']]
         num_channels = [
             num_channels[i] * block.expansion for i in range(len(num_channels))]
         self.transition1 = self._make_transition_layer(
@@ -288,9 +288,9 @@ class HighResolutionNet(nn.Module):
         self.stage2, pre_stage_channels = self._make_stage(
             self.stage2_cfg, num_channels)
 
-        self.stage3_cfg = config.MODEL.EXTRA.STAGE3
-        num_channels = self.stage3_cfg.NUM_CHANNELS
-        block = blocks_dict[self.stage3_cfg.BLOCK]
+        self.stage3_cfg = extra['STAGE3']
+        num_channels = self.stage3_cfg['NUM_CHANNELS']
+        block = blocks_dict[self.stage3_cfg['BLOCK']]
         num_channels = [
             num_channels[i] * block.expansion for i in range(len(num_channels))]
         self.transition2 = self._make_transition_layer(
@@ -298,9 +298,9 @@ class HighResolutionNet(nn.Module):
         self.stage3, pre_stage_channels = self._make_stage(
             self.stage3_cfg, num_channels)
 
-        self.stage4_cfg = config.MODEL.EXTRA.STAGE4
-        num_channels = self.stage4_cfg.NUM_CHANNELS
-        block = blocks_dict[self.stage4_cfg.BLOCK]
+        self.stage4_cfg = extra['STAGE4']
+        num_channels = self.stage4_cfg['NUM_CHANNELS']
+        block = blocks_dict[self.stage4_cfg['BLOCK']]
         num_channels = [
             num_channels[i] * block.expansion for i in range(len(num_channels))]
         self.transition3 = self._make_transition_layer(
@@ -321,10 +321,10 @@ class HighResolutionNet(nn.Module):
             nn.ReLU(inplace=False),
             nn.Conv2d(
                 in_channels=last_inp_channels,
-                out_channels=config.DATASET.NUM_CLASSES,
-                kernel_size=config.MODEL.EXTRA.FINAL_CONV_KERNEL,
+                out_channels=config['DATASET']['NUM_CLASSES'],
+                kernel_size=extra['FINAL_CONV_KERNEL'],
                 stride=1,
-                padding=1 if config.MODEL.EXTRA.FINAL_CONV_KERNEL == 3 else 0)
+                padding=1 if extra['FINAL_CONV_KERNEL'] == 3 else 0)
         )
 
     def _make_transition_layer(
