@@ -261,7 +261,7 @@ class HighResolutionNet(nn.Module):
 
     def __init__(self, config, **kwargs): 
         super(HighResolutionNet, self).__init__()
-        extra = config["EXTRA"]
+        extra = config['MODEL']["EXTRA"]
         # stem net
         self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=2, padding=1,
                                bias=False)
