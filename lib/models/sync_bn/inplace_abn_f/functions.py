@@ -5,7 +5,7 @@ import torch.cuda.comm as comm
 from torch.autograd.function import once_differentiable
 from torch.utils.cpp_extension import load
 
-_src_path = "lib/models/sync_bn/inplace_abn/src"
+_src_path = "lib/models/sync_bn/inplace_abn_f/src"
 _backend = load(name="inplace_abn",
                 extra_cflags=["-O3"],
                 sources=[path.join(_src_path, f) for f in [
